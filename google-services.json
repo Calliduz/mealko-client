@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "807505505040",
+    "project_id": "mealko",
+    "storage_bucket": "mealko.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:807505505040:android:2ba8ca43a85a190c9b5395",
+        "android_client_info": {
+          "package_name": "com.calliduz.mealkoclient"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "807505505040-qvh0tn4gfkffc3at8ojhc3on0abgr479.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsjbYTBRPwZoxd32l_ZTlx7hea1m50_qc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "807505505040-qvh0tn4gfkffc3at8ojhc3on0abgr479.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
