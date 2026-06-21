@@ -7,7 +7,41 @@ import {
   updateProfile
 } from 'firebase/auth';
 import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
 import { auth, onAuthChange } from './firebase';
+
+// Web-safe storage helpers since expo-secure-store throws on Web platform
+const setAuthToken = async (token: string) => {
+  if (Platform.OS === 'web') {
+    try {
+      localStorage.setItem('auth_token', token);
+    } catch (e) {}
+  } else {
+    await SecureStore.setItemAsync('auth_token', token);
+  }
+};
+
+const getAuthToken = async (): Promise<string | null> => {
+  if (Platform.OS === 'web') {
+    try {
+      return localStorage.getItem('auth_token');
+    } catch (e) {
+      return null;
+    }
+  } else {
+    return await SecureStore.getItemAsync('auth_token');
+  }
+};
+
+const deleteAuthToken = async () => {
+  if (Platform.OS === 'web') {
+    try {
+      localStorage.removeItem('auth_token');
+    } catch (e) {}
+  } else {
+    await SecureStore.deleteItemAsync('auth_token');
+  }
+};
 
 interface AuthContextType {
   user: User | null;
@@ -33,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Check for cached token on startup
     async function loadCachedToken() {
       try {
-        const cachedToken = await SecureStore.getItemAsync('auth_token');
+        const cachedToken = await getAuthToken();
         if (cachedToken) {
           setIdToken(cachedToken);
         }
@@ -50,7 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (firebaseUser) {
         try {
           const token = await firebaseUser.getIdToken(true);
-          await SecureStore.setItemAsync('auth_token', token);
+          await setAuthToken(token);
           setIdToken(token);
           setUser(firebaseUser);
 
@@ -79,7 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setIdToken(null);
         }
       } else {
-        await SecureStore.deleteItemAsync('auth_token');
+        await deleteAuthToken();
         setUser(null);
         setIdToken(null);
         setIsAuthenticated(false);
