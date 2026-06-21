@@ -1,4 +1,5 @@
 import { Database } from '@nozbe/watermelondb';
+import SQLiteAdapter from '@nozbe/watermelondb/adapters/sqlite';
 import schema from './schema';
 import Ingredient from './models/Ingredient';
 import IngredientAlternative from './models/IngredientAlternative';
@@ -13,26 +14,17 @@ import MarketTag from './models/MarketTag';
 import GroceryList from './models/GroceryList';
 import GroceryListItem from './models/GroceryListItem';
 
-// Web-only mock adapter to prevent Metro from compiling better-sqlite3 or lokijs native packages
-const mockAdapter = {
+const adapter = new SQLiteAdapter({
   schema,
-  dbName: 'mealko_web_mock',
-  batch: async () => {},
-  count: async () => 0,
-  find: async () => null,
-  query: async () => {
-    return [];
+  dbName: 'mealko',
+  jsi: true,
+  onSetUpError: (error) => {
+    console.error('Failed to set up database adapter', error);
   },
-  getDeletedRecords: async () => [],
-  destroyDeletedRecords: async () => {},
-  setLocal: async () => {},
-  getLocal: async () => null,
-  removeLocal: async () => {},
-  unsafeResetDatabase: async () => {},
-} as any;
+});
 
 export const database = new Database({
-  adapter: mockAdapter,
+  adapter,
   modelClasses: [
     Ingredient,
     IngredientAlternative,
