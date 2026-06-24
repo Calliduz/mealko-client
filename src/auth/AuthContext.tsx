@@ -166,30 +166,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signUp = async (email: string, password: string, displayName?: string) => {
-    setIsLoading(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       if (displayName && userCredential.user) {
         await updateProfile(userCredential.user, { displayName });
       }
     } catch (error) {
-      setIsLoading(false);
       throw error;
     }
   };
 
   const signIn = async (email: string, password: string) => {
-    setIsLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
-      setIsLoading(false);
       throw error;
     }
   };
 
   const signInMock = async (mockUserId: string) => {
-    setIsLoading(true);
     try {
       const mockUserData = mockUsersList.find(u => u.uid === mockUserId);
       if (!mockUserData) {
@@ -232,8 +227,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(null);
       setIdToken(null);
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 

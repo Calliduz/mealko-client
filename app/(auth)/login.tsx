@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { YStack, XStack, Text, Input, Button, H1, Spinner } from 'tamagui';
 import { useAuth } from '../../src/auth/AuthContext';
+import { getAuthErrorMessage } from '../../src/auth/errorUtils';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -13,7 +14,7 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      setError('Please enter both email and password.');
+      setError('Please enter both your email address and password.');
       return;
     }
     setError(null);
@@ -22,7 +23,7 @@ export default function LoginScreen() {
       await signIn(email, password);
     } catch (err: any) {
       console.error(err);
-      setError(err.message || 'Failed to sign in. Please check your credentials.');
+      setError(getAuthErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -35,120 +36,305 @@ export default function LoginScreen() {
       await signInMock(mockId);
     } catch (err: any) {
       console.error(err);
-      setError(err.message || 'Mock login failed.');
+      setError(getAuthErrorMessage(err));
     } finally {
       setLoading(false);
     }
   };
 
   const handleGoogleSignIn = () => {
-    // Placeholder for native Google Sign-in trigger
     setError('Google Sign-In will be initialized on the device using Google Play Services.');
   };
 
   return (
-    <YStack style={{ flex: 1, backgroundColor: '#121212', justifyContent: 'center', padding: 24 }}>
-      <YStack style={{ gap: 24, maxWidth: 400, width: '100%', alignSelf: 'center' }}>
-        <YStack style={{ alignItems: 'center', gap: 8 }}>
-          <Text style={{ fontSize: 48 }}>🥗</Text>
-          <H1 style={{ color: '#ffffff', fontWeight: 'bold' }}>Welcome to MealKo</H1>
-          <Text style={{ color: '#aaaaaa', fontSize: 16 }}>Sign in to plan your meals</Text>
+    <YStack style={{ flex: 1, backgroundColor: '#080D0B', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+      {/* Background radial highlight simulation */}
+      <YStack
+        style={{
+          position: 'absolute',
+          width: 600,
+          height: 600,
+          borderRadius: 300,
+          backgroundColor: '#10B981',
+          opacity: 0.03,
+          filter: 'blur(100px)',
+          top: '10%',
+          left: '10%',
+          pointerEvents: 'none',
+        }}
+      />
+      <YStack
+        style={{
+          position: 'absolute',
+          width: 600,
+          height: 600,
+          borderRadius: 300,
+          backgroundColor: '#059669',
+          opacity: 0.02,
+          filter: 'blur(120px)',
+          bottom: '10%',
+          right: '10%',
+          pointerEvents: 'none',
+        }}
+      />
+
+      <YStack style={{ width: '100%', maxWidth: 420, gap: 24 }}>
+        {/* Brand Header */}
+        <YStack style={{ alignItems: 'center', gap: 12, marginBottom: 8 }}>
+          <YStack
+            style={{
+              width: 72,
+              height: 72,
+              borderRadius: 36,
+              backgroundColor: '#111815',
+              borderWidth: 1.5,
+              borderColor: '#10B981',
+              justifyContent: 'center',
+              alignItems: 'center',
+              shadowColor: '#10B981',
+              shadowOpacity: 0.15,
+              shadowRadius: 12,
+              shadowOffset: { width: 0, height: 4 },
+            }}
+          >
+            <Text style={{ fontSize: 36, lineHeight: 40 }}>🥗</Text>
+          </YStack>
+          <H1
+            style={{
+              color: '#ffffff',
+              fontWeight: '900',
+              fontSize: 32,
+              letterSpacing: -0.8,
+              textAlign: 'center',
+            }}
+          >
+            MealKo
+          </H1>
+          <Text style={{ color: '#7C938A', fontSize: 15, fontWeight: '500', textAlign: 'center' }}>
+            Plan, shop, and prep your meals with ease
+          </Text>
         </YStack>
 
-        <YStack style={{ gap: 12 }}>
+        {/* Login Card */}
+        <YStack
+          style={{
+            backgroundColor: '#111815',
+            borderColor: '#1C2E26',
+            borderWidth: 1,
+            borderRadius: 24,
+            padding: 32,
+            gap: 20,
+            shadowColor: '#000000',
+            shadowOffset: { width: 0, height: 16 },
+            shadowOpacity: 0.4,
+            shadowRadius: 32,
+          }}
+        >
           {error && (
-            <Text style={{ color: '#ff4d4d', fontSize: 14, textAlign: 'center' }}>
-              {error}
-            </Text>
+            <XStack
+              style={{
+                backgroundColor: '#2A1414',
+                borderColor: '#5C1D1D',
+                borderWidth: 1,
+                borderRadius: 12,
+                padding: 14,
+                gap: 10,
+                alignItems: 'center',
+              }}
+            >
+              <Text style={{ fontSize: 18 }}>⚠️</Text>
+              <Text style={{ color: '#FCA5A5', fontSize: 13, fontWeight: '500', flex: 1, lineHeight: 18 }}>
+                {error}
+              </Text>
+            </XStack>
           )}
 
-          <Input
-            placeholder="Email Address"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            style={{ backgroundColor: '#1e1e1e', borderColor: '#333333', color: '#ffffff' }}
-          />
+          {/* Form Inputs */}
+          <YStack style={{ gap: 14 }}>
+            <Input
+              placeholder="Email Address"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              placeholderTextColor="#4B665A"
+              style={{
+                backgroundColor: '#16221E',
+                borderColor: '#243A30',
+                borderWidth: 1,
+                borderRadius: 12,
+                color: '#ffffff',
+                height: 48,
+                paddingHorizontal: 16,
+                fontSize: 14,
+              }}
+              focusStyle={{
+                borderColor: '#10B981',
+                backgroundColor: '#182722',
+                borderWidth: 1.5,
+              }}
+            />
 
-          <Input
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            autoCapitalize="none"
-            style={{ backgroundColor: '#1e1e1e', borderColor: '#333333', color: '#ffffff' }}
-          />
+            <Input
+              placeholder="Password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              autoCapitalize="none"
+              placeholderTextColor="#4B665A"
+              style={{
+                backgroundColor: '#16221E',
+                borderColor: '#243A30',
+                borderWidth: 1,
+                borderRadius: 12,
+                color: '#ffffff',
+                height: 48,
+                paddingHorizontal: 16,
+                fontSize: 14,
+              }}
+              focusStyle={{
+                borderColor: '#10B981',
+                backgroundColor: '#182722',
+                borderWidth: 1.5,
+              }}
+            />
+          </YStack>
 
-          <Button
-            onPress={handleLogin}
-            disabled={loading}
-            style={{ backgroundColor: '#ffffff', color: '#121212', fontWeight: 'bold', marginTop: 12 }}
-          >
-            {loading ? <Spinner color="#121212" /> : 'Sign In'}
-          </Button>
+          {/* Actions */}
+          <YStack style={{ gap: 12, marginTop: 4 }}>
+            <Button
+              onPress={handleLogin}
+              disabled={loading}
+              style={{
+                backgroundColor: '#10B981',
+                borderRadius: 12,
+                height: 48,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+              hoverStyle={{ backgroundColor: '#059669' }}
+              pressStyle={{ scale: 0.97, opacity: 0.9 }}
+            >
+              {loading ? (
+                <Spinner color="#111815" />
+              ) : (
+                <Text style={{ color: '#080D0B', fontWeight: 'bold', fontSize: 15 }}>Sign In</Text>
+              )}
+            </Button>
 
-          <Button
-            onPress={handleGoogleSignIn}
-            style={{ backgroundColor: '#4285F4', color: '#ffffff', fontWeight: 'bold', marginTop: 8 }}
-          >
-            Sign In with Google
-          </Button>
+            <Button
+              onPress={handleGoogleSignIn}
+              style={{
+                backgroundColor: '#16221E',
+                borderColor: '#243A30',
+                borderWidth: 1,
+                borderRadius: 12,
+                height: 48,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+              hoverStyle={{ backgroundColor: '#1C2E26', borderColor: '#345244' }}
+              pressStyle={{ scale: 0.97 }}
+            >
+              <XStack gap="$2" alignItems="center">
+                {/* Simulated Google Logo Icon */}
+                <Text style={{ color: '#ffffff', fontSize: 13, fontWeight: '700' }}>G</Text>
+                <Text style={{ color: '#ffffff', fontWeight: '600', fontSize: 14 }}>Sign In with Google</Text>
+              </XStack>
+            </Button>
+          </YStack>
 
+          {/* Quick Mock Login Panel for Dev Mode */}
           {process.env.EXPO_PUBLIC_ALLOW_MOCK_AUTH === 'true' && (
             <YStack
-              gap="$2"
-              marginTop="$3"
-              padding="$3"
-              borderRadius="$4"
-              borderWidth={1}
-              borderColor="#333333"
-              backgroundColor="#181818"
+              style={{
+                marginTop: 8,
+                backgroundColor: '#0F1613',
+                borderColor: '#1F3129',
+                borderWidth: 1,
+                borderRadius: 16,
+                padding: 16,
+                gap: 12,
+              }}
             >
-              <Text color="#aaaaaa" fontSize={13} fontWeight="600" alignSelf="center">
-                🔧 Development Quick Mock Login
-              </Text>
-              <XStack justifyContent="space-between" gap="$2" flexWrap="wrap">
-                <Button
-                  onPress={() => handleMockLogin('mock-user-1')}
-                  disabled={loading}
-                  backgroundColor="#2a2a2a"
-                  hoverStyle={{ backgroundColor: '#3a3a3a' }}
-                  flex={1}
-                  minWidth={90}
-                >
-                  <Text color="#4affa3" fontSize={12} fontWeight="bold">Alice (2p)</Text>
-                </Button>
-                <Button
-                  onPress={() => handleMockLogin('mock-user-2')}
-                  disabled={loading}
-                  backgroundColor="#2a2a2a"
-                  hoverStyle={{ backgroundColor: '#3a3a3a' }}
-                  flex={1}
-                  minWidth={90}
-                >
-                  <Text color="#4ad9ff" fontSize={12} fontWeight="bold">Bob (4p)</Text>
-                </Button>
-                <Button
-                  onPress={() => handleMockLogin('mock-user-3')}
-                  disabled={loading}
-                  backgroundColor="#2a2a2a"
-                  hoverStyle={{ backgroundColor: '#3a3a3a' }}
-                  flex={1}
-                  minWidth={90}
-                >
-                  <Text color="#ffd64a" fontSize={12} fontWeight="bold">Charlie (1p)</Text>
-                </Button>
+              <XStack alignItems="center" justifyContent="center" gap="$2">
+                <YStack style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#10B981' }} />
+                <Text style={{ color: '#68867A', fontSize: 11, fontWeight: '700', letterSpacing: 0.8 }}>
+                  DEVELOPER PROFILE BYPASS
+                </Text>
               </XStack>
+
+              <YStack gap="$2">
+                {[
+                  { id: 'mock-user-1', name: 'Alice', size: '2p', color: '#10B981', init: 'A' },
+                  { id: 'mock-user-2', name: 'Bob', size: '4p', color: '#3B82F6', init: 'B' },
+                  { id: 'mock-user-3', name: 'Charlie', size: '1p', color: '#F59E0B', init: 'C' },
+                ].map((userProfile) => (
+                  <Button
+                    key={userProfile.id}
+                    onPress={() => handleMockLogin(userProfile.id)}
+                    disabled={loading}
+                    style={{
+                      backgroundColor: '#16221E',
+                      borderRadius: 10,
+                      height: 42,
+                      paddingHorizontal: 12,
+                      justifyContent: 'flex-start',
+                      alignItems: 'center',
+                      borderWidth: 1,
+                      borderColor: '#1F3129',
+                    }}
+                    hoverStyle={{ backgroundColor: '#1C2E26', borderColor: '#345244' }}
+                    pressStyle={{ scale: 0.96 }}
+                  >
+                    <XStack alignItems="center" justify="space-between" width="100%">
+                      <XStack gap="$3" alignItems="center">
+                        <YStack
+                          style={{
+                            width: 26,
+                            height: 26,
+                            borderRadius: 13,
+                            backgroundColor: userProfile.color + '20',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            borderWidth: 1,
+                            borderColor: userProfile.color,
+                          }}
+                        >
+                          <Text style={{ color: userProfile.color, fontSize: 12, fontWeight: 'bold' }}>
+                            {userProfile.init}
+                          </Text>
+                        </YStack>
+                        <Text style={{ color: '#E2E8F0', fontSize: 13, fontWeight: '600' }}>
+                          {userProfile.name}
+                        </Text>
+                      </XStack>
+                      <YStack
+                        style={{
+                          backgroundColor: '#1F3129',
+                          borderRadius: 6,
+                          paddingHorizontal: 6,
+                          paddingVertical: 2,
+                        }}
+                      >
+                        <Text style={{ color: '#10B981', fontSize: 10, fontWeight: 'bold' }}>
+                          {userProfile.size}
+                        </Text>
+                      </YStack>
+                    </XStack>
+                  </Button>
+                ))}
+              </YStack>
             </YStack>
           )}
         </YStack>
 
-        <XStack style={{ justifyContent: 'center', gap: 6, marginTop: 16 }}>
-          <Text style={{ color: '#aaaaaa' }}>Don't have an account?</Text>
+        {/* Footer Link */}
+        <XStack style={{ justifyContent: 'center', gap: 6, marginTop: 8 }}>
+          <Text style={{ color: '#7C938A', fontSize: 14 }}>Don't have an account?</Text>
           <Text
             onPress={() => router.push('/signup')}
-            style={{ color: '#ffffff', fontWeight: 'bold', textDecorationLine: 'underline' }}
+            style={{ color: '#10B981', fontWeight: 'bold', fontSize: 14, textDecorationLine: 'underline' }}
           >
             Sign Up
           </Text>
@@ -157,4 +343,3 @@ export default function LoginScreen() {
     </YStack>
   );
 }
-
