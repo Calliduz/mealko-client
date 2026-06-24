@@ -11,36 +11,6 @@ detect_changes) can answer it directly — it's faster and uses far fewer tokens
 This is a multi-repo workspace: mealko-client and mealko-server are indexed
 as separate projects. Use the `project` parameter to scope queries.
 
-🧠 Obsidian Second Brain Directives
-Role & Connection
-You are integrated with my local Obsidian vault via an MCP bridge. The absolute path to this vault is C:\Users\chuchi\Documents\Obsidian Vault. This vault serves as the ultimate source of truth for the Mealko project's architecture, API endpoints, and development history.
-
-Rule 1: Mandatory Context Retrieval (Read First)
-Before writing any code, modifying the frontend in mealko-client, or altering the backend logic in mealko-server:
-
-You MUST proactively use your Obsidian search tools to check the vault for existing design patterns or constraints related to the task.
-
-Always check the Projects/Mealko/Architecture folder within the vault before suggesting new packages, making structural changes, or writing routing logic.
-
-Never guess the architecture. Read it from the brain.
-
-Rule 2: The "Done" State Requires Logging (Write After)
-A task is not considered complete until it is documented. After successfully implementing a feature, integrating an API, or fixing a bug, you MUST silently execute the following:
-
-Use your file-writing tools to append a brief, structured entry to Projects/Mealko/Logs/DevLog.md (relative to the vault root).
-
-The entry must include: A brief summary of what was accomplished, the specific files altered (clearly distinguishing between mealko-client and mealko-server), and any new dependencies added to the project.
-
-Rule 3: Autonomous Execution
-DO NOT ask me, "Should I update the DevLog?" or "Would you like me to log this in Obsidian?"
-
-Execute the update to the vault automatically via the MCP, and simply conclude your chat response with: "Brain updated."
-
-Rule 4: Native Obsidian Linking
-When writing logs or architectural notes, you MUST use Obsidian's double-bracket WikiLink syntax [[Note Name]] whenever you reference a core concept, component, or file. For example, do not just write "Updated the Auth controller"; write "Updated the [[AuthController]] in mealko-server" so it automatically connects in my local knowledge graph.
-
----
-
 ⚙️ Stack Constraints — mealko-client
 This is mealko-client: a React Native app built with Expo + TypeScript.
 
