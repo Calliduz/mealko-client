@@ -51,7 +51,26 @@ interface AuthContextType {
   signUp: (email: string, password: string, displayName?: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  signInMock: (mockUserId: string) => Promise<void>;
 }
+
+const mockUsersList = [
+  {
+    uid: 'mock-user-1',
+    email: 'alice@mealko.com',
+    displayName: 'Alice Meal Planner',
+  },
+  {
+    uid: 'mock-user-2',
+    email: 'bob@mealko.com',
+    displayName: 'Bob Meal Planner',
+  },
+  {
+    uid: 'mock-user-3',
+    email: 'charlie@mealko.com',
+    displayName: 'Charlie Meal Planner',
+  },
+];
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -70,9 +89,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const cachedToken = await getAuthToken();
         if (cachedToken) {
           setIdToken(cachedToken);
+          if (cachedToken.startsWith('mock-user-')) {
+            const mockUserData = mockUsersList.find(u => u.uid === cachedToken);
+            if (mockUserData) {
+              const mockFirebaseUser = {
+                uid: mockUserData.uid,
+                email: mockUserData.email,
+                displayName: mockUserData.displayName,
+                getIdToken: async () => mockUserData.uid,
+              } as any;
+              setUser(mockFirebaseUser);
+              setIsAuthenticated(true);
+            }
+          }
         }
       } catch (err) {
         console.error('Failed to load cached auth token:', err);
+      } finally {
+        setIsLoading(false);
       }
     }
     loadCachedToken();
@@ -80,6 +114,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const unsubscribe = onAuthChange(async (firebaseUser) => {
+      // If we have a cached mock token, do not let standard firebase listener clear it
+      const currentToken = await getAuthToken();
+      if (currentToken && currentToken.startsWith('mock-user-')) {
+        setIsLoading(false);
+        return;
+      }
+
       setIsLoading(true);
       if (firebaseUser) {
         try {
@@ -147,13 +188,71 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const signInMock = async (mockUserId: string) => {
+    setIsLoading(true);
+    try {
+      const mockUserData = mockUsersList.find(u => u.uid === mockUserId);
+      if (!mockUserData) {
+        throw new Error(`Mock user ${mockUserId} not found.`);
+      }
+
+      const mockFirebaseUser = {
+        uid: mockUserData.uid,
+        email: mockUserData.email,
+        displayName: mockUserData.displayName,
+        getIdToken: async () => mockUserData.uid,
+      } as any;
+
+      const token = mockUserData.uid;
+      await setAuthToken(token);
+      setIdToken(token);
+      setUser(mockFirebaseUser);
+
+      // Provision user in Neon DB
+      const response = await fetch(`${API_URL}/auth/provision`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          email: mockFirebaseUser.email,
+          displayName: mockFirebaseUser.displayName,
+        }),
+      });
+
+      if (!response.ok) {
+        console.error('Failed to provision user in Neon DB:', response.status);
+      }
+
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error('Error during mock sign in:', error);
+      setIsAuthenticated(false);
+      setUser(null);
+      setIdToken(null);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const signOut = async () => {
     setIsLoading(true);
     try {
-      await firebaseSignOut(auth);
+      const cachedToken = await getAuthToken();
+      if (cachedToken && cachedToken.startsWith('mock-user-')) {
+        await deleteAuthToken();
+        setUser(null);
+        setIdToken(null);
+        setIsAuthenticated(false);
+      } else {
+        await firebaseSignOut(auth);
+      }
     } catch (error) {
-      setIsLoading(false);
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -167,6 +266,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signUp,
         signIn,
         signOut,
+        signInMock,
       }}
     >
       {children}
@@ -181,3 +281,4 @@ export function useAuth() {
   }
   return context;
 }
+

@@ -20,6 +20,8 @@ export default function HomeScreen() {
         const existing = await ingredientsCollection.query().fetch();
         console.log(`[WatermelonDB] Found ${existing.length} existing ingredients.`);
 
+
+
         let testIngName = '';
 
         if (existing.length === 0) {

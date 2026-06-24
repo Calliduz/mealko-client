@@ -5,7 +5,7 @@ import { useAuth } from '../../src/auth/AuthContext';
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { signIn } = useAuth();
+  const { signIn, signInMock } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -23,6 +23,19 @@ export default function LoginScreen() {
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'Failed to sign in. Please check your credentials.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleMockLogin = async (mockId: string) => {
+    setError(null);
+    setLoading(true);
+    try {
+      await signInMock(mockId);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'Mock login failed.');
     } finally {
       setLoading(false);
     }
@@ -81,6 +94,54 @@ export default function LoginScreen() {
           >
             Sign In with Google
           </Button>
+
+          {process.env.EXPO_PUBLIC_ALLOW_MOCK_AUTH === 'true' && (
+            <YStack
+              gap="$2"
+              marginTop="$3"
+              padding="$3"
+              borderRadius="$4"
+              borderWidth={1}
+              borderColor="#333333"
+              backgroundColor="#181818"
+            >
+              <Text color="#aaaaaa" fontSize={13} fontWeight="600" alignSelf="center">
+                🔧 Development Quick Mock Login
+              </Text>
+              <XStack justifyContent="space-between" gap="$2" flexWrap="wrap">
+                <Button
+                  onPress={() => handleMockLogin('mock-user-1')}
+                  disabled={loading}
+                  backgroundColor="#2a2a2a"
+                  hoverStyle={{ backgroundColor: '#3a3a3a' }}
+                  flex={1}
+                  minWidth={90}
+                >
+                  <Text color="#4affa3" fontSize={12} fontWeight="bold">Alice (2p)</Text>
+                </Button>
+                <Button
+                  onPress={() => handleMockLogin('mock-user-2')}
+                  disabled={loading}
+                  backgroundColor="#2a2a2a"
+                  hoverStyle={{ backgroundColor: '#3a3a3a' }}
+                  flex={1}
+                  minWidth={90}
+                >
+                  <Text color="#4ad9ff" fontSize={12} fontWeight="bold">Bob (4p)</Text>
+                </Button>
+                <Button
+                  onPress={() => handleMockLogin('mock-user-3')}
+                  disabled={loading}
+                  backgroundColor="#2a2a2a"
+                  hoverStyle={{ backgroundColor: '#3a3a3a' }}
+                  flex={1}
+                  minWidth={90}
+                >
+                  <Text color="#ffd64a" fontSize={12} fontWeight="bold">Charlie (1p)</Text>
+                </Button>
+              </XStack>
+            </YStack>
+          )}
         </YStack>
 
         <XStack style={{ justifyContent: 'center', gap: 6, marginTop: 16 }}>
@@ -96,3 +157,4 @@ export default function LoginScreen() {
     </YStack>
   );
 }
+

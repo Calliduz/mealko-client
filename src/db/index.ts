@@ -1,4 +1,5 @@
 import { Database } from '@nozbe/watermelondb';
+import LokiJSAdapter from '@nozbe/watermelondb/adapters/lokijs';
 import schema from './schema';
 import Ingredient from './models/Ingredient';
 import IngredientAlternative from './models/IngredientAlternative';
@@ -13,26 +14,14 @@ import MarketTag from './models/MarketTag';
 import GroceryList from './models/GroceryList';
 import GroceryListItem from './models/GroceryListItem';
 
-// Web-only mock adapter to prevent Metro from compiling better-sqlite3 or lokijs native packages
-const mockAdapter = {
+const adapter = new LokiJSAdapter({
   schema,
-  dbName: 'mealko_web_mock',
-  batch: async () => {},
-  count: async () => 0,
-  find: async () => null,
-  query: async () => {
-    return [];
-  },
-  getDeletedRecords: async () => [],
-  destroyDeletedRecords: async () => {},
-  setLocal: async () => {},
-  getLocal: async () => null,
-  removeLocal: async () => {},
-  unsafeResetDatabase: async () => {},
-} as any;
+  useWebWorker: false,
+  useIncrementalIndexedDB: false, // Safe, fast in-memory storage for web environments
+});
 
 export const database = new Database({
-  adapter: mockAdapter,
+  adapter,
   modelClasses: [
     Ingredient,
     IngredientAlternative,
